@@ -13,8 +13,23 @@ export default function Hero() {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
     let particles = [];
-    const MAX_PARTICLES = 60;
+    const MAX_PARTICLES = 120; // Increased particle count
     const CONN_DIS = 120;
+    
+    // Mouse tracking
+    let mouse = { x: -1000, y: -1000 };
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    };
+    const handleMouseLeave = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseout', handleMouseLeave);
     
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -28,19 +43,42 @@ export default function Hero() {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.8;
-        this.vy = (Math.random() - 0.5) * 0.8;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = (Math.random() - 0.5) * 1.5;
       }
       update() {
+        // Hover reaction: scatter away from mouse
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < 150) {
+          const force = (150 - dist) / 150;
+          this.vx -= (dx / dist) * force * 1.5;
+          this.vy -= (dy / dist) * force * 1.5;
+        }
+
         this.x += this.vx;
         this.y += this.vy;
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        
+        // Gentle friction to prevent infinite acceleration
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+
+        // Base wandering energy
+        if (Math.abs(this.vx) < 0.2) this.vx += (Math.random() - 0.5) * 0.2;
+        if (Math.abs(this.vy) < 0.2) this.vy += (Math.random() - 0.5) * 0.2;
+
+        // Bounce off edges
+        if (this.x < 0) { this.x = 0; this.vx *= -1; }
+        if (this.x > canvas.width) { this.x = canvas.width; this.vx *= -1; }
+        if (this.y < 0) { this.y = 0; this.vy *= -1; }
+        if (this.y > canvas.height) { this.y = canvas.height; this.vy *= -1; }
       }
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 163, 255, 0.6)';
+        ctx.fillStyle = 'rgba(0, 163, 255, 0.7)';
         ctx.fill();
       }
     }
@@ -62,7 +100,7 @@ export default function Hero() {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(0, 163, 255, ${0.5 * (1 - dist / CONN_DIS)})`;
+            ctx.strokeStyle = `rgba(0, 163, 255, ${0.4 * (1 - dist / CONN_DIS)})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -73,6 +111,8 @@ export default function Hero() {
     animate();
 
     return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseout', handleMouseLeave);
       window.removeEventListener('resize', resizeCanvas);
       cancelAnimationFrame(animationFrameId);
     };

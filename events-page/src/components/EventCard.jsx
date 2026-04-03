@@ -50,7 +50,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
             src={event.image} 
             alt={event.name}
             loading="lazy"
-            className="w-full h-full object-contain p-2 transition-transform duration-700 hover:scale-[1.04]"
+            className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-[1.04]"
             onError={() => setImgFailed(true)}
           />
         </div>

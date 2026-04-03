@@ -11,7 +11,7 @@ export default function CurvedArrow({ fromRight }) {
   const pathData = `M ${startX},0 C ${startX},65 ${endX},35 ${endX},100`;
 
   return (
-    <div className="w-full h-24 lg:h-32 hidden lg:block relative -my-3 z-0 pointer-events-none">
+    <div className="w-full h-24 lg:h-32 hidden lg:block relative -my-3 z-20 pointer-events-none">
       <svg 
         width="100%" 
         height="100%" 
