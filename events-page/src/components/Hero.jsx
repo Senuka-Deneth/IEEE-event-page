@@ -52,17 +52,17 @@ export default function Hero() {
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        if (dist < 200 && dist > 0) {
-          const force = (200 - dist) / 200;
-          this.vx -= (dx / dist) * force * 0.03;
-          this.vy -= (dy / dist) * force * 0.03;
+        if (dist < 250 && dist > 0) {
+          const force = (250 - dist) / 250;
+          this.vx -= (dx / dist) * force * 0.1;
+          this.vy -= (dy / dist) * force * 0.1;
         }
 
         // Limit maximum speed to ensure no sudden jumps or chaotic movements
         const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-        if (speed > 1.0) {
-          this.vx = (this.vx / speed) * 1.0;
-          this.vy = (this.vy / speed) * 1.0;
+        if (speed > 1.8) {
+          this.vx = (this.vx / speed) * 1.8;
+          this.vy = (this.vy / speed) * 1.8;
         }
 
         this.x += this.vx;

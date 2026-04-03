@@ -9,11 +9,11 @@ const EventCard = React.memo(({ event, index, isRight }) => {
   
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.15,
-    rootMargin: "0px 0px -50px 0px"
+    threshold: 0,
+    rootMargin: "0px 0px -30px 0px"
   });
 
-  const slideAnim = isRight ? { x: 60 } : { x: -60 };
+  const slideAnim = isRight ? { x: 50 } : { x: -50 };
   
   const desktopAnim = {
     hidden: { opacity: 0, ...slideAnim },
@@ -36,7 +36,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={finalAnim}
-      transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
       whileHover={{ y: -6, boxShadow: "0 0 0 2px #00A3FF, 0 0 45px rgba(0,163,255,0.45)" }}
     >
       {/* Decorative center bounds */}
