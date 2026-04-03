@@ -8,7 +8,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
   const shouldReduceMotion = useReducedMotion();
   
   const { ref, inView } = useInView({
-    triggerOnce: true,
+    triggerOnce: false,
     threshold: 0,
     rootMargin: "0px 0px -30px 0px"
   });
@@ -32,31 +32,27 @@ const EventCard = React.memo(({ event, index, isRight }) => {
   return (
     <motion.div
       ref={ref}
-      className="relative flex-1 bg-ieee-surface border border-ieee-border rounded-xl shadow-lg sm:border sm:border-ieee-border flex flex-col overflow-hidden"
+      className="relative w-full bg-ieee-surface border border-ieee-border rounded-xl shadow-lg flex flex-col md:grid md:grid-cols-[4fr_6fr] overflow-hidden"
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={finalAnim}
       transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
       whileHover={{ y: -6, boxShadow: "0 0 0 2px #00A3FF, 0 0 45px rgba(0,163,255,0.45)" }}
     >
-      {/* Decorative center bounds */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-[2px] bg-gradient-to-r from-transparent via-ieee-blue to-transparent opacity-50 block lg:hidden" />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-[2px] bg-gradient-to-r from-transparent via-ieee-blue to-transparent opacity-50 block lg:hidden" />
-
       {/* Card Content */}
       {(!imgFailed && event.image) && (
-        <div className="w-full h-[220px] bg-[#031124] overflow-hidden relative border-b border-ieee-border/30">
+        <div className="w-full h-[250px] md:h-full bg-[#031124] overflow-hidden relative border-b md:border-b-0 md:border-r border-ieee-border/30">
           <img 
             src={event.image} 
             alt={event.name}
             loading="lazy"
-            className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-[1.04]"
+            className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-[1.04]"
             onError={() => setImgFailed(true)}
           />
         </div>
       )}
 
-      <div className="p-8 flex flex-col flex-grow">
+      <div className="p-8 lg:p-10 flex flex-col justify-center flex-grow">
         <div className="flex items-center justify-between mb-5">
           <span 
             className="px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase font-display"
