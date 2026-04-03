@@ -47,29 +47,36 @@ export default function Hero() {
         this.vy = (Math.random() - 0.5) * 1.5;
       }
       update() {
-        // Hover reaction: scatter away from mouse
+        // Gentle hover reaction: slowly ease away from mouse
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        if (dist < 150) {
-          const force = (150 - dist) / 150;
-          this.vx -= (dx / dist) * force * 1.5;
-          this.vy -= (dy / dist) * force * 1.5;
+        if (dist < 200 && dist > 0) {
+          const force = (200 - dist) / 200;
+          this.vx -= (dx / dist) * force * 0.03;
+          this.vy -= (dy / dist) * force * 0.03;
+        }
+
+        // Limit maximum speed to ensure no sudden jumps or chaotic movements
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > 1.0) {
+          this.vx = (this.vx / speed) * 1.0;
+          this.vy = (this.vy / speed) * 1.0;
         }
 
         this.x += this.vx;
         this.y += this.vy;
         
-        // Gentle friction to prevent infinite acceleration
-        this.vx *= 0.98;
-        this.vy *= 0.98;
+        // Very gentle friction
+        this.vx *= 0.99;
+        this.vy *= 0.99;
 
         // Base wandering energy
-        if (Math.abs(this.vx) < 0.2) this.vx += (Math.random() - 0.5) * 0.2;
-        if (Math.abs(this.vy) < 0.2) this.vy += (Math.random() - 0.5) * 0.2;
+        if (Math.abs(this.vx) < 0.2) this.vx += (Math.random() - 0.5) * 0.05;
+        if (Math.abs(this.vy) < 0.2) this.vy += (Math.random() - 0.5) * 0.05;
 
-        // Bounce off edges
+        // Smoothly bounce off edges
         if (this.x < 0) { this.x = 0; this.vx *= -1; }
         if (this.x > canvas.width) { this.x = canvas.width; this.vx *= -1; }
         if (this.y < 0) { this.y = 0; this.vy *= -1; }
@@ -92,6 +99,23 @@ export default function Hero() {
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
         particles[i].draw();
+        
+        // Draw lines from particle to mouse if nearby
+        if (mouse.x !== -1000) {
+          const dxMouse = mouse.x - particles[i].x;
+          const dyMouse = mouse.y - particles[i].y;
+          const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+          if (distMouse < CONN_DIS) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(0, 163, 255, ${0.4 * (1 - distMouse / CONN_DIS)})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+
+        // Draw lines between particles
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
