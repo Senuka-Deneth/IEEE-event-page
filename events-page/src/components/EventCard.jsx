@@ -37,7 +37,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
       animate={inView ? "visible" : "hidden"}
       variants={finalAnim}
       transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-      whileHover={{ y: -6, boxShadow: "0 0 35px rgba(0,163,255,0.25)" }}
+      whileHover={{ y: -6, boxShadow: "0 0 0 2px #00A3FF, 0 0 45px rgba(0,163,255,0.45)" }}
     >
       {/* Decorative center bounds */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-[2px] bg-gradient-to-r from-transparent via-ieee-blue to-transparent opacity-50 block lg:hidden" />
@@ -50,7 +50,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
             src={event.image} 
             alt={event.name}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-700 hover:scale-[1.03]"
+            className="w-full h-full object-contain p-2 transition-transform duration-700 hover:scale-[1.04]"
             onError={() => setImgFailed(true)}
           />
         </div>
