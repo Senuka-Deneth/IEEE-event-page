@@ -41,7 +41,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
     >
       {/* Card Content */}
       {(!imgFailed && event.image) && (
-        <div className="w-full h-[250px] md:h-full bg-[#031124] overflow-hidden relative border-b md:border-b-0 md:border-r border-ieee-border/30">
+        <div className="w-full h-[250px] md:h-full overflow-hidden relative bg-[#0A1628]">
           <img 
             src={event.image} 
             alt={event.name}
@@ -49,6 +49,8 @@ const EventCard = React.memo(({ event, index, isRight }) => {
             className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-[1.04]"
             onError={() => setImgFailed(true)}
           />
+          {/* Sleek edge fade gradient: vertical for mobile, horizontal for desktop */}
+          <div className="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-transparent from-60% md:from-50% to-[#0A1628] pointer-events-none" />
         </div>
       )}
 
