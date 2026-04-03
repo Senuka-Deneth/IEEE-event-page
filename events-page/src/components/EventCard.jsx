@@ -9,11 +9,11 @@ const EventCard = React.memo(({ event, index, isRight }) => {
   
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.15,
-    rootMargin: "0px 0px -50px 0px"
+    threshold: 0,
+    rootMargin: "0px 0px -30px 0px"
   });
 
-  const slideAnim = isRight ? { x: 60 } : { x: -60 };
+  const slideAnim = isRight ? { x: 50 } : { x: -50 };
   
   const desktopAnim = {
     hidden: { opacity: 0, ...slideAnim },
@@ -36,8 +36,8 @@ const EventCard = React.memo(({ event, index, isRight }) => {
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={finalAnim}
-      transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-      whileHover={{ y: -6, boxShadow: "0 0 35px rgba(0,163,255,0.25)" }}
+      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+      whileHover={{ y: -6, boxShadow: "0 0 0 2px #00A3FF, 0 0 45px rgba(0,163,255,0.45)" }}
     >
       {/* Decorative center bounds */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-[2px] bg-gradient-to-r from-transparent via-ieee-blue to-transparent opacity-50 block lg:hidden" />
@@ -50,7 +50,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
             src={event.image} 
             alt={event.name}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-700 hover:scale-[1.03]"
+            className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-[1.04]"
             onError={() => setImgFailed(true)}
           />
         </div>
