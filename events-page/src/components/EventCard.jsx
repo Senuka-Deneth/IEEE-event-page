@@ -27,16 +27,14 @@ const EventCard = React.memo(({ event, index, isRight }) => {
     return () => clearInterval(interval);
   }, [images.length]);
 
-  const slideAnim = isRight ? { x: 50 } : { x: -50 };
-  
   const desktopAnim = {
-    hidden: { opacity: 0, ...slideAnim },
-    visible: { opacity: 1, x: 0 }
+    hidden: { opacity: 0, scale: 0.8, y: 30 },
+    visible: { opacity: 1, scale: 1, y: 0 }
   };
   
   const mobileAnim = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, scale: 0.8, y: 30 },
+    visible: { opacity: 1, scale: 1, y: 0 }
   };
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
@@ -56,7 +54,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={finalAnim}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
       whileHover={{ y: -6, boxShadow: "0 0 0 2px #00A3FF, 0 0 45px rgba(0,163,255,0.45)" }}
     >
       {/* Image Container - Dynamic Carousel */}
