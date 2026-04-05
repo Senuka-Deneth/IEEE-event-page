@@ -13,8 +13,8 @@ export default function Hero() {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
     let particles = [];
-    const MAX_PARTICLES = 120; // Increased particle count
-    const CONN_DIS = 120;
+    const MAX_PARTICLES = 160; // Increased particle count for better density
+    const CONN_DIS = 160; // Increased connection distance
     
     // Mouse tracking
     let mouse = { x: -1000, y: -1000 };
@@ -38,13 +38,14 @@ export default function Hero() {
     
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-
+ 
     class Particle {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
         this.vx = (Math.random() - 0.5) * 1.5;
         this.vy = (Math.random() - 0.5) * 1.5;
+        this.color = Math.random() > 0.5 ? 'rgba(0, 163, 255, 0.8)' : 'rgba(0, 224, 255, 0.8)';
       }
       update() {
         // Gentle hover reaction: slowly ease away from mouse
@@ -57,25 +58,25 @@ export default function Hero() {
           this.vx -= (dx / dist) * force * 0.1;
           this.vy -= (dy / dist) * force * 0.1;
         }
-
+ 
         // Limit maximum speed to ensure no sudden jumps or chaotic movements
         const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
         if (speed > 1.8) {
           this.vx = (this.vx / speed) * 1.8;
           this.vy = (this.vy / speed) * 1.8;
         }
-
+ 
         this.x += this.vx;
         this.y += this.vy;
         
         // Very gentle friction
         this.vx *= 0.99;
         this.vy *= 0.99;
-
+ 
         // Base wandering energy
         if (Math.abs(this.vx) < 0.2) this.vx += (Math.random() - 0.5) * 0.05;
         if (Math.abs(this.vy) < 0.2) this.vy += (Math.random() - 0.5) * 0.05;
-
+ 
         // Smoothly bounce off edges
         if (this.x < 0) { this.x = 0; this.vx *= -1; }
         if (this.x > canvas.width) { this.x = canvas.width; this.vx *= -1; }
@@ -84,16 +85,22 @@ export default function Hero() {
       }
       draw() {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 163, 255, 0.7)';
+        ctx.arc(this.x, this.y, 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        
+        // Add subtle glow effect
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = this.color;
+        
         ctx.fill();
+        ctx.shadowBlur = 0; // Reset for next draw
       }
     }
-
+ 
     for (let i = 0; i < MAX_PARTICLES; i++) {
       particles.push(new Particle());
     }
-
+ 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let i = 0; i < particles.length; i++) {
@@ -109,12 +116,13 @@ export default function Hero() {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = `rgba(0, 163, 255, ${0.4 * (1 - distMouse / CONN_DIS)})`;
-            ctx.lineWidth = 1;
+            // Increased line opacity for better visibility
+            ctx.strokeStyle = `rgba(0, 163, 255, ${0.5 * (1 - distMouse / CONN_DIS)})`;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
           }
         }
-
+ 
         // Draw lines between particles
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -124,7 +132,8 @@ export default function Hero() {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(0, 163, 255, ${0.4 * (1 - dist / CONN_DIS)})`;
+            // Increased line opacity for better visibility
+            ctx.strokeStyle = `rgba(0, 163, 255, ${0.5 * (1 - dist / CONN_DIS)})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -133,7 +142,7 @@ export default function Hero() {
       animationFrameId = requestAnimationFrame(animate);
     };
     animate();
-
+ 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseout', handleMouseLeave);
@@ -141,12 +150,12 @@ export default function Hero() {
       cancelAnimationFrame(animationFrameId);
     };
   }, [shouldReduceMotion]);
-
+ 
   return (
-    <section className="relative min-h-[40vh] py-32 flex flex-col justify-center items-center overflow-hidden bg-ieee-bg text-center px-4">
+    <section className="relative min-h-[50vh] py-32 flex flex-col justify-center items-center overflow-hidden bg-ieee-bg text-center px-4 bg-[radial-gradient(#00a3ff12_1.5px,transparent_1.5px)] [background-size:48px_48px]">
       <canvas 
         ref={canvasRef} 
-        className="absolute top-0 left-0 w-full h-full pointer-events-none"
+        className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-80"
         aria-hidden="true"
       />
       
