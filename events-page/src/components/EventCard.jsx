@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { ArrowRight } from 'lucide-react';
 
 const EventCard = React.memo(({ event, index, isRight }) => {
   const [imgFailed, setImgFailed] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const shouldReduceMotion = useReducedMotion();
+  
+  const images = event.images && event.images.length > 0 ? event.images : [];
   
   const { ref, inView } = useInView({
     triggerOnce: false,
     threshold: 0,
     rootMargin: "0px 0px -30px 0px"
   });
+
+  // Auto-play logic for carousel
+  useEffect(() => {
+    if (images.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   const slideAnim = isRight ? { x: 50 } : { x: -50 };
   
@@ -29,6 +43,12 @@ const EventCard = React.memo(({ event, index, isRight }) => {
   const anim = isMobile ? mobileAnim : desktopAnim;
   const finalAnim = shouldReduceMotion ? { hidden: { opacity: 0 }, visible: { opacity: 1 } } : anim;
 
+  const handleDotClick = (e, idx) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex(idx);
+  };
+
   return (
     <motion.div
       ref={ref}
@@ -39,8 +59,8 @@ const EventCard = React.memo(({ event, index, isRight }) => {
       transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
       whileHover={{ y: -6, boxShadow: "0 0 0 2px #00A3FF, 0 0 45px rgba(0,163,255,0.45)" }}
     >
-      {/* Image Container - Gradient applied directly to image with large transparency area */}
-      {(!imgFailed && event.image) && (
+      {/* Image Container - Dynamic Carousel */}
+      {(!imgFailed && images.length > 0) && (
         <div 
           className="w-full h-[250px] md:h-full md:col-span-5 md:col-start-1 md:row-start-1 overflow-hidden relative"
           style={{
@@ -52,13 +72,61 @@ const EventCard = React.memo(({ event, index, isRight }) => {
               : 'linear-gradient(to right, black 25%, transparent 90%)'
           }}
         >
-          <img 
-            src={event.image} 
-            alt={event.name}
-            loading="lazy"
-            className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-[1.04]"
-            onError={() => setImgFailed(true)}
-          />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentImageIndex}
+              className="absolute inset-0 w-full h-full"
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+            >
+              <motion.img 
+                src={images[currentImageIndex]} 
+                alt={`${event.name} view ${currentImageIndex + 1}`}
+                loading="lazy"
+                className="w-full h-full object-cover object-center"
+                animate={{ 
+                  scale: [1, 1.08],
+                  x: [0, 5],
+                  y: [0, -5]
+                }}
+                transition={{ 
+                  duration: 6, 
+                  repeat: Infinity, 
+                  repeatType: "reverse", 
+                  ease: "linear" 
+                }}
+                onError={() => setImgFailed(true)}
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Dot Indicators */}
+          {images.length > 1 && (
+            <div className="absolute bottom-4 left-6 md:left-8 flex gap-2.5 z-20">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => handleDotClick(e, i)}
+                  className={`group relative h-1.5 transition-all duration-500 rounded-full overflow-hidden ${
+                    i === currentImageIndex ? 'w-8 bg-ieee-blue' : 'w-3 bg-white/20 hover:bg-white/40'
+                  }`}
+                  aria-label={`Show image ${i + 1}`}
+                >
+                  {i === currentImageIndex && (
+                    <motion.div 
+                      className="absolute inset-0 bg-white/30"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 5, ease: "linear" }}
+                      style={{ originX: 0 }}
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
