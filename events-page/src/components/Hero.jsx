@@ -13,8 +13,8 @@ export default function Hero() {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
     let particles = [];
-    const MAX_PARTICLES = 160; // Increased particle count for better density
-    const CONN_DIS = 160; // Increased connection distance
+    const MAX_PARTICLES = 190; // Balanced density (slightly reduced)
+    const CONN_DIS = 160;
     
     // Mouse tracking
     let mouse = { x: -1000, y: -1000 };
@@ -46,20 +46,38 @@ export default function Hero() {
         this.vx = (Math.random() - 0.5) * 1.5;
         this.vy = (Math.random() - 0.5) * 1.5;
         this.color = Math.random() > 0.5 ? 'rgba(0, 163, 255, 0.8)' : 'rgba(0, 224, 255, 0.8)';
+        this.radius = 2.2;
       }
-      update() {
-        // Gentle hover reaction: slowly ease away from mouse
+      update(allParticles) {
+        // 1. Mouse Repulsion - Very subtle and localized
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        if (dist < 250 && dist > 0) {
-          const force = (250 - dist) / 250;
-          this.vx -= (dx / dist) * force * 0.1;
-          this.vy -= (dy / dist) * force * 0.1;
+        if (dist < 180 && dist > 0) {
+          const force = (180 - dist) / 180;
+          this.vx -= (dx / dist) * force * 0.05; // Significant reduction in push-back
+          this.vy -= (dy / dist) * force * 0.05;
+        }
+
+        // 2. Inter-Particle Separation (Prevent Overlapping)
+        for (let i = 0; i < allParticles.length; i++) {
+          const other = allParticles[i];
+          if (other === this) continue;
+          
+          const dxP = other.x - this.x;
+          const dyP = other.y - this.y;
+          const distP = Math.sqrt(dxP * dxP + dyP * dyP);
+          const minDist = 22; // Personal space (prevent overlap)
+          
+          if (distP < minDist && distP > 0) {
+            const forceP = (minDist - distP) / minDist;
+            this.vx -= (dxP / distP) * forceP * 0.08;
+            this.vy -= (dyP / distP) * forceP * 0.08;
+          }
         }
  
-        // Limit maximum speed to ensure no sudden jumps or chaotic movements
+        // 3. Speed Control & Movement
         const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
         if (speed > 1.8) {
           this.vx = (this.vx / speed) * 1.8;
@@ -85,15 +103,14 @@ export default function Hero() {
       }
       draw() {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 2.2, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         
-        // Add subtle glow effect
         ctx.shadowBlur = 8;
         ctx.shadowColor = this.color;
         
         ctx.fill();
-        ctx.shadowBlur = 0; // Reset for next draw
+        ctx.shadowBlur = 0;
       }
     }
  
@@ -104,26 +121,11 @@ export default function Hero() {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
+        particles[i].update(particles);
         particles[i].draw();
         
-        // Draw lines from particle to mouse if nearby
-        if (mouse.x !== -1000) {
-          const dxMouse = mouse.x - particles[i].x;
-          const dyMouse = mouse.y - particles[i].y;
-          const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
-          if (distMouse < CONN_DIS) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(mouse.x, mouse.y);
-            // Increased line opacity for better visibility
-            ctx.strokeStyle = `rgba(0, 163, 255, ${0.5 * (1 - distMouse / CONN_DIS)})`;
-            ctx.lineWidth = 1.2;
-            ctx.stroke();
-          }
-        }
+        // Removed lines to mouse position to make interaction more subtle
  
-        // Draw lines between particles
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
@@ -132,8 +134,7 @@ export default function Hero() {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            // Increased line opacity for better visibility
-            ctx.strokeStyle = `rgba(0, 163, 255, ${0.5 * (1 - dist / CONN_DIS)})`;
+            ctx.strokeStyle = `rgba(0, 163, 255, ${0.45 * (1 - dist / CONN_DIS)})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
