@@ -32,16 +32,26 @@ const EventCard = React.memo(({ event, index, isRight }) => {
   return (
     <motion.div
       ref={ref}
-      className="relative w-full bg-ieee-surface border border-ieee-border rounded-xl shadow-lg flex flex-col md:grid md:grid-cols-[4fr_6fr] overflow-hidden"
+      className="relative w-full bg-ieee-surface border border-ieee-border rounded-xl shadow-lg flex flex-col md:grid md:grid-cols-12 overflow-hidden"
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={finalAnim}
       transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
       whileHover={{ y: -6, boxShadow: "0 0 0 2px #00A3FF, 0 0 45px rgba(0,163,255,0.45)" }}
     >
-      {/* Card Content */}
+      {/* Image Container - Gradient applied directly to image with large transparency area */}
       {(!imgFailed && event.image) && (
-        <div className="w-full h-[250px] md:h-full overflow-hidden relative bg-[#0A1628]">
+        <div 
+          className="w-full h-[250px] md:h-full md:col-span-5 md:col-start-1 md:row-start-1 overflow-hidden relative"
+          style={{
+            WebkitMaskImage: isMobile 
+              ? 'linear-gradient(to bottom, black 30%, transparent 95%)'
+              : 'linear-gradient(to right, black 25%, transparent 90%)',
+            maskImage: isMobile 
+              ? 'linear-gradient(to bottom, black 30%, transparent 95%)'
+              : 'linear-gradient(to right, black 25%, transparent 90%)'
+          }}
+        >
           <img 
             src={event.image} 
             alt={event.name}
@@ -52,7 +62,8 @@ const EventCard = React.memo(({ event, index, isRight }) => {
         </div>
       )}
 
-      <div className="p-8 lg:p-10 flex flex-col justify-center flex-grow">
+      {/* Text Content - No overall gradient, minimal overlap */}
+      <div className="relative p-8 lg:p-10 flex flex-col justify-center flex-grow md:col-span-8 md:col-start-5 md:row-start-1 z-10 -mt-4 md:mt-0">
         <div className="flex items-center justify-between mb-5">
           <span 
             className="px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase font-display"
