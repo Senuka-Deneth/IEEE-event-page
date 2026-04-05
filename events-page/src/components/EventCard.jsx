@@ -41,13 +41,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
     >
       {/* Card Content */}
       {(!imgFailed && event.image) && (
-        <div 
-          className="w-full h-[250px] md:h-full overflow-hidden relative bg-[#0A1628]"
-          style={{ 
-            WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 100%)',
-            maskImage: 'linear-gradient(to right, black 40%, transparent 100%)'
-          }}
-        >
+        <div className="w-full h-[250px] md:h-full overflow-hidden relative bg-[#0A1628]">
           <img 
             src={event.image} 
             alt={event.name}
