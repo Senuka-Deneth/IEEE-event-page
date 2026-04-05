@@ -32,7 +32,7 @@ const EventCard = React.memo(({ event, index, isRight }) => {
   return (
     <motion.div
       ref={ref}
-      className="relative w-full bg-ieee-surface border border-ieee-border rounded-xl shadow-lg flex flex-col md:grid md:grid-cols-12 overflow-hidden"
+      className="relative w-full bg-ieee-surface border border-ieee-border rounded-xl shadow-lg flex flex-col md:grid md:grid-cols-[4fr_6fr] overflow-hidden"
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={finalAnim}
@@ -42,7 +42,11 @@ const EventCard = React.memo(({ event, index, isRight }) => {
       {/* Card Content */}
       {(!imgFailed && event.image) && (
         <div 
-          className="w-full h-[250px] md:h-full md:col-span-5 md:col-start-1 md:row-start-1 overflow-hidden relative bg-[#0A1628] [mask-image:linear-gradient(to_bottom,black_65%,transparent_100%)] md:[mask-image:linear-gradient(to_right,black_65%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_65%,transparent_100%)] md:[-webkit-mask-image:linear-gradient(to_right,black_65%,transparent_100%)]"
+          className="w-full h-[250px] md:h-full overflow-hidden relative bg-[#0A1628]"
+          style={{ 
+            WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 100%)',
+            maskImage: 'linear-gradient(to right, black 40%, transparent 100%)'
+          }}
         >
           <img 
             src={event.image} 
@@ -51,18 +55,10 @@ const EventCard = React.memo(({ event, index, isRight }) => {
             className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-[1.04]"
             onError={() => setImgFailed(true)}
           />
-          {/* Dark overlay: increased intensity near the text overlay area */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'linear-gradient(to right, transparent 60%, rgba(10,22,40,0.4) 75%, rgba(10,22,40,0.99) 100%)' }}
-          />
         </div>
       )}
 
-      <div 
-        className="p-8 lg:p-10 flex flex-col justify-center flex-grow md:col-span-8 md:col-start-5 md:row-start-1 z-10 -mt-6 md:mt-0"
-        style={{ background: 'linear-gradient(to right, transparent, rgba(10,22,40,0.92) 30%, rgb(10,22,40) 60%)' }}
-      >
+      <div className="p-8 lg:p-10 flex flex-col justify-center flex-grow">
         <div className="flex items-center justify-between mb-5">
           <span 
             className="px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase font-display"
